@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MindFlip – قلب الفكرة</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Tahoma', sans-serif;
+      background: linear-gradient(135deg, #5B247A, #1BCEDF);
+      color: white;
+      text-align: center;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .start-image {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #000000cc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      animation: fadeOut 2.5s forwards 2.5s;
+    }
+
+    .start-image img {
+      max-width: 80%;
+      max-height: 80%;
+      border-radius: 20px;
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+
+    .start-screen {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 30px;
+    }
+
+    .start-screen h1 {
+      font-size: 2.5rem;
+    }
+
+    .start-screen button {
+      background-color: #ffffff;
+      color: #5B247A;
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.5s ease;
+    }
+
+    .start-screen button:hover {
+      background-color: #eeeeee;
+    }
+
+    .idea-box {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 20px;
+      font-size: 1.5rem;
+      margin-bottom: 30px;
+      min-height: 100px;
+    }
+
+    .category {
+      margin-bottom: 15px;
+    }
+
+    .category select {
+      font-size: 1rem;
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      color: #5B247A;
+    }
+
+    button.generate, button.copy, button.favorite, button.share {
+      background-color: #ffffff;
+      color: #5B247A;
+      padding: 12px 25px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.2s ease;
+      margin: 10px 5px;
+    }
+
+    .corner-controls {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .corner-controls button {
+      padding: 6px 12px;
+      font-size: 0.9rem;
+    }
+
+    #volumeDisplay {
+      font-size: 0.8rem;
+      color: white;
+      margin-top: 4px;
+      opacity: 0.8;
+    }
+
+    .favorite-list {
+      margin-top: 30px;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 15px;
+      text-align: right;
+    }
+
+    .favorite-list h2 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    .favorite-list ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .favorite-list li {
+      margin-bottom: 10px;
+      background-color: rgba(255, 255, 255, 0.2);
+      padding: 10px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .favorite-list li button {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .clear-favorites {
+      background: #ff4444;
+      color: white;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    footer {
+      margin-top: 50px;
+      font-size: 1.3rem;
+      opacity: 0.9;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      .idea-box { font-size: 1.2rem; padding: 20px; }
+      button.generate, button.copy, button.favorite, button.share { padding: 10px 20px; font-size: 1rem; }
+      .corner-controls button { padding: 5px 10px; font-size: 0.8rem; }
+      footer { font-size: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="start-image" id="startImage">
+    <img src="myimage.png" alt="شعار الموقع">
+  </div>
+
+
+
+  <div class="start-screen" id="startScreen">
+    <h1>🎯 اختر طريقة العرض</h1>
+    <button onclick="startApp('mobile')">📱 عرض الهاتف</button>
+    <button onclick="startApp('desktop')">💻 عرض الكمبيوتر</button>
+  </div>
+
+  <div id="mainApp" style="display:none">
+    <h1>💡 MindFlip</h1>
+
+    <div class="category">
+      <label>اختر تصنيفًا:</label>
+      <select id="categorySelect" onchange="generateIdea()">
+        <option value="all">الكل</option>
+        <option value="self">تطوير الذات</option>
+        <option value="tech">تقنية</option>
+        <option value="health">صحة</option>
+        <option value="life">حياة</option>
+      </select>
+    </div>
+
+    <div class="idea-box" id="idea">اضغط الزر لقلب فكرة جديدة!</div>
+    <button class="generate" onclick="generateIdea()">🎲 قلب فكرة</button>
+    <button class="copy" onclick="copyIdea()">📋 نسخ</button>
+    <button class="favorite" onclick="saveFavorite()">⭐ حفظ في المفضلة</button>
+    <button class="share" onclick="shareIdea()">🔗 مشاركة</button>
+
+    <div class="corner-controls" id="cornerControls">
+      <button onclick="toggleMusic()" id="musicBtn">🔇</button>
+      <button onclick="changeMusic()">🎵 تغيير الموسيقى</button>
+      <input type="range" min="0" max="1" step="0.01" value="0.1" oninput="setVolume(this.value)">
+      <div id="volumeDisplay">🔈 مستوى الصوت: 10%</div>
+    </div>
+
+    <div class="favorite-list" id="favoriteListContainer" style="display: none;">
+      <h2>⭐ المفضلة</h2>
+      <ul id="favoriteList"></ul>
+      <button class="clear-favorites" onclick="clearFavorites()">🗑️ مسح الكل</button>
+    </div>
+
+    <footer>💖 صُنع بحُب بواسطة Mohad Anwar 💖</footer>
+
+    <audio id="flipSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3" preload="auto"></audio>
+    <audio id="bgMusic" src="https://www.bensound.com/bensound-music/bensound-slowmotion.mp3" loop></audio>
+  </div>
+
+  <script>
+    const ideaData = [ { text: "ابدأ يومك بالتخطيط لهدف صغير.", category: "life" },
+  { text: "خذ استراحة قصيرة كل ساعة لزيادة التركيز.", category: "self" },
+  { text: "جرب تطبيق جديد لتتبع العادات.", category: "tech" },
+  { text: "مارس رياضة خفيفة لمدة 10 دقائق.", category: "health" },
+  { text: "اكتب ثلاثة أشياء تشكر لأجلها اليوم.", category: "life" }];
+   
+  
+  const musicTracks = ["https://www.bensound.com/bensound-music/bensound-slowmotion.mp3",
+                      "https://www.bensound.com/bensound-music/bensound-dreams.mp3"];
+    let currentTrack = 0;
+    let favorites = [];
+
+    const bgMusic = document.getElementById("bgMusic");
+    const musicBtn = document.getElementById("musicBtn");
+    const volumeDisplay = document.getElementById("volumeDisplay");
+    const favoriteList = document.getElementById("favoriteList");
+    const favoriteListContainer = document.getElementById("favoriteListContainer");
+
+    bgMusic.volume = 0.1;
+
+    function generateIdea() {
+      const category = document.getElementById("categorySelect").value;
+      const filtered = category === "all" ? ideaData : ideaData.filter(i => i.category === category);
+      const idea = filtered[Math.floor(Math.random() * filtered.length)];
+      document.getElementById("idea").textContent = idea.text;
+      document.getElementById("flipSound").play();
+    }
+
+    function copyIdea() {
+      const idea = document.getElementById("idea").textContent;
+      navigator.clipboard.writeText(idea).then(() => alert("تم نسخ الفكرة!"));
+    }
+
+    function saveFavorite() {
+      const idea = document.getElementById("idea").textContent;
+      if (!favorites.includes(idea)) {
+        favorites.push(idea);
+        localStorage.setItem("mindflipFavorites", JSON.stringify(favorites));
+        displayFavorites();
+        alert("⭐ تم حفظ الفكرة في المفضلة!");
+      } else {
+        alert("⭐ هذه الفكرة موجودة بالفعل في المفضلة!");
+      }
+    }
+
+    function displayFavorites() {
+      favoriteList.innerHTML = "";
+      favorites.forEach((idea, index) => {
+        const li = document.createElement("li");
+        li.innerHTML = `${idea} <button onclick="removeFavorite(${index})">❌</button>`;
+        favoriteList.appendChild(li);
+      });
+      favoriteListContainer.style.display = favorites.length > 0 ? "block" : "none";
+    }
+
+    function removeFavorite(index) {
+      favorites.splice(index, 1);
+      localStorage.setItem("mindflipFavorites", JSON.stringify(favorites));
+      displayFavorites();
+    }
+
+    function clearFavorites() {
+      if (confirm("هل أنت متأكد من مسح كل المفضلة؟")) {
+        favorites = [];
+        localStorage.removeItem("mindflipFavorites");
+        displayFavorites();
+      }
+    }
+
+    function shareIdea() {}
+    function toggleMusic() {}
+    function changeMusic() {}
+    function adjustVolume(change) {}
+    function setVolume(value) {
+      bgMusic.volume = value;
+      volumeDisplay.textContent = `🔈 مستوى الصوت: ${Math.round(value * 100)}%`;
+    }
+
+    function startApp(mode) {
+      document.getElementById("startScreen").style.display = "none";
+      document.getElementById("mainApp").style.display = "block";
+      document.getElementById("cornerControls").style.display = "flex";
+      const playPromise = bgMusic.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(err => console.warn("⚠️ لم يتم تشغيل الموسيقى تلقائيًا:", err));
+      }
+      if (mode === 'mobile') {
+        document.body.style.fontSize = '16px';
+      } else {
+        document.body.style.fontSize = '18px';
+      }
+
+      const storedFavorites = JSON.parse(localStorage.getItem("mindflipFavorites")) || [];
+      favorites = storedFavorites;
+      displayFavorites();
+    }
+  </script>
+</body>
+</html>
